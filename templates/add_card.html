@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>...</head>
+<body>
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card card-box p-4">
+            <h4 class="fw-semibold mb-3">Add Card Field</h4>
+
+            <form method="POST">
+
+                <div class="mb-3">
+                    <label class="form-label">Card Group (number)</label>
+                    <input class="form-control" name="group" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Field Name</label>
+                    <select class="form-select" name="field" required>
+                        <option value="">Select field</option>
+                        <option value="Name">Name</option>
+                        <option value="Company">Company</option>
+                        <option value="Email">Email</option>
+                        <option value="Phone">Phone</option>
+                        <option value="Date">Date</option>
+                        <option value="Products">Products</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Value</label>
+                    <input class="form-control" name="value" id="valueInput" required>
+                </div>
+
+                <button class="btn btn-dark w-100">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('select[name="field"]').addEventListener('change', function () {
+    const input = document.getElementById('valueInput');
+    switch (this.value) {
+        case 'Email':
+            input.type = 'email';
+            input.placeholder = 'example@company.com';
+            break;
+        case 'Phone':
+            input.type = 'tel';
+            input.placeholder = '+91XXXXXXXXXX';
+            break;
+        case 'Date':
+            input.type = 'date';
+            break;
+        default:
+            input.type = 'text';
+            input.placeholder = '';
+    }
+});
+</script>
+
+{% endblock %}

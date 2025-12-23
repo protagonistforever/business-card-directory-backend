@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-semibold">Admin Dashboard</h3>
+    <a href="/admin/add" class="btn btn-dark">+ Add Field</a>
+</div>
+
+<div class="row g-4">
+{% for group, fields in cards.items() %}
+    <div class="col-md-6">
+        <div class="card card-box p-3">
+            <div class="d-flex justify-content-between">
+                <h5 class="fw-semibold">Card #{{ group }}</h5>
+                <a href="/admin/delete/{{ group }}" class="btn btn-sm btn-outline-danger">Delete</a>
+            </div>
+            <hr>
+            {% for k, v in fields.items() %}
+                <div><b>{{ k }}:</b> {{ v }}</div>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% endblock %}
