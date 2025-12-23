@@ -56,11 +56,18 @@ def add():
         return redirect("/admin")
 
     if request.method == "POST":
-        add_field(
-            int(request.form["group"]),
-            request.form["field"],
-            request.form["value"],
-        )
+        # Safe retrieval of all fields
+        try:
+            group = int(request.form.get("group", 0))
+        except ValueError:
+            group = 0  # default if not provided or invalid
+
+        fields = ["name", "company", "email", "phone", "date", "products", "custom"]
+        for f in fields:
+            value = request.form.get(f)
+            if value:  # only save non-empty fields
+                add_field(group, f, value)
+
         return redirect("/admin/dashboard")
 
     return render_template("add_card.html")
@@ -78,4 +85,4 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
