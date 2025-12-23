@@ -1,60 +1,80 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card card-box p-4">
-            <h4 class="fw-semibold mb-3">Add Card Field</h4>
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4">
+            <h4 class="fw-semibold mb-4 text-center">Add Card Fields</h4>
 
-            <form method="POST">
+            <form method="POST" id="cardForm">
+                <div class="row g-3">
 
-                <div class="mb-3">
-                    <label class="form-label">Card Group (number)</label>
-                    <input class="form-control" name="group" required>
+                    <div class="col-12">
+                        <label class="form-label">Name</label>
+                        <input class="form-control" name="name" placeholder="Enter name">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Company</label>
+                        <input class="form-control" name="company" placeholder="Enter company">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Email</label>
+                        <input class="form-control" type="email" name="email" placeholder="example@company.com">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Phone Number</label>
+                        <input class="form-control" type="tel" name="phone" placeholder="+91XXXXXXXXXX" maxlength="13">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Date</label>
+                        <input class="form-control" type="date" name="date">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Products</label>
+                        <input class="form-control" name="products" placeholder="Enter products">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Custom</label>
+                        <input class="form-control" name="custom" placeholder="Enter custom field">
+                    </div>
+
+                    <div class="col-12">
+                        <button class="btn btn-dark w-100 mt-3">Save</button>
+                    </div>
+
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Field Name</label>
-                    <select class="form-select" name="field" required>
-                        <option value="">Select field</option>
-                        <option value="Name">Name</option>
-                        <option value="Company">Company</option>
-                        <option value="Email">Email</option>
-                        <option value="Phone">Phone</option>
-                        <option value="Date">Date</option>
-                        <option value="Products">Products</option>
-                        <option value="Custom">Custom</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Value</label>
-                    <input class="form-control" name="value" id="valueInput" required>
-                </div>
-
-                <button class="btn btn-dark w-100">Save</button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-document.querySelector('select[name="field"]').addEventListener('change', function () {
-    const input = document.getElementById('valueInput');
-    switch (this.value) {
-        case 'Email':
-            input.type = 'email';
-            input.placeholder = 'example@company.com';
-            break;
-        case 'Phone':
-            input.type = 'tel';
-            input.placeholder = '+91XXXXXXXXXX';
-            break;
-        case 'Date':
-            input.type = 'date';
-            break;
-        default:
-            input.type = 'text';
-            input.placeholder = '';
+const phoneInput = document.querySelector('input[name="phone"]');
+
+// Allow only digits and auto-format for +91 XXXXX XXXXX
+phoneInput.addEventListener('input', function(e) {
+    let val = this.value.replace(/\D/g, ''); // remove non-digits
+    if(val.startsWith('91')) val = val.slice(2);
+    if(val.length > 10) val = val.slice(0,10);
+    if(val.length > 5) {
+        this.value = '+91 ' + val.slice(0,5) + ' ' + val.slice(5);
+    } else if(val.length > 0) {
+        this.value = '+91 ' + val;
+    } else {
+        this.value = '';
+    }
+});
+
+// Simple email validation on blur
+document.querySelector('input[name="email"]').addEventListener('blur', function() {
+    if(this.value && !/^\S+@\S+\.\S+$/.test(this.value)) {
+        alert('Invalid email format');
+        this.focus();
     }
 });
 </script>
