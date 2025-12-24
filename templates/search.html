@@ -16,19 +16,65 @@
 
 {% if cards %}
 <div class="row g-4">
-    {% for group, fields in cards.items() %}
+
+    {% for card in cards %}
     <div class="col-md-6">
         <div class="card card-box p-3">
-            <h5 class="fw-semibold mb-2">Card #{{ group }}</h5>
-            {% for k, v in fields.items() %}
-                <div class="d-flex">
-                    <div class="fw-semibold me-2">{{ k }}:</div>
-                    <div class="text-muted">{{ v }}</div>
-                </div>
-            {% endfor %}
+            <h5 class="fw-semibold mb-2">Card #{{ card[0] }}</h5>
+
+            {% if card[1] %}
+            <div class="d-flex">
+                <div class="fw-semibold me-2">Name:</div>
+                <div class="text-muted">{{ card[1] }}</div>
+            </div>
+            {% endif %}
+
+            {% if card[2] %}
+            <div class="d-flex">
+                <div class="fw-semibold me-2">Company:</div>
+                <div class="text-muted">{{ card[2] }}</div>
+            </div>
+            {% endif %}
+
+            {% if card[3] %}
+            <div class="d-flex">
+                <div class="fw-semibold me-2">Email:</div>
+                <div class="text-muted">{{ card[3] }}</div>
+            </div>
+            {% endif %}
+
+            {% if card[4] %}
+            <div class="d-flex">
+                <div class="fw-semibold me-2">Phone:</div>
+                <div class="text-muted">{{ card[4] }}</div>
+            </div>
+            {% endif %}
+
+            {% if card[5] %}
+            <div class="d-flex">
+                <div class="fw-semibold me-2">Date:</div>
+                <div class="text-muted">{{ card[5] }}</div>
+            </div>
+            {% endif %}
+
+            {% if card[6] %}
+            <div class="d-flex">
+                <div class="fw-semibold me-2">Products:</div>
+                <div class="text-muted">{{ card[6] }}</div>
+            </div>
+            {% endif %}
+
+            {% if card[7] %}
+            <div class="d-flex">
+                <div class="fw-semibold me-2">Custom:</div>
+                <div class="text-muted">{{ card[7] }}</div>
+            </div>
+            {% endif %}
+
         </div>
     </div>
     {% endfor %}
+
 </div>
 {% else %}
 <p class="text-muted text-center">No results found.</p>
