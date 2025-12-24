@@ -8,46 +8,55 @@
             <form method="POST" action="{{ url_for('add') }}">
                 <div class="row g-3">
 
+                    <!-- Card Group -->
                     <div class="col-12">
                         <label class="form-label">Card Group (number)</label>
-                        <input class="form-control" name="group" placeholder="Enter group number">
+                        <input class="form-control" name="group_id" type="number" placeholder="Enter group number" required>
                     </div>
 
+                    <!-- Name -->
                     <div class="col-12">
                         <label class="form-label">Name</label>
                         <input class="form-control" name="name" placeholder="Enter name">
                     </div>
 
+                    <!-- Company -->
                     <div class="col-12">
                         <label class="form-label">Company</label>
                         <input class="form-control" name="company" placeholder="Enter company">
                     </div>
 
+                    <!-- Email -->
                     <div class="col-12">
                         <label class="form-label">Email</label>
-                        <input class="form-control" name="email" placeholder="Enter email">
+                        <input class="form-control" name="email" type="email" placeholder="Enter email">
                     </div>
 
+                    <!-- Phone -->
                     <div class="col-12">
                         <label class="form-label">Phone Number</label>
                         <input class="form-control" name="phone" placeholder="Enter phone number">
                     </div>
 
+                    <!-- Date -->
                     <div class="col-12">
                         <label class="form-label">Date</label>
-                        <input class="form-control" name="date" placeholder="Enter date">
+                        <input class="form-control" name="date" type="date" placeholder="Enter date">
                     </div>
 
+                    <!-- Products -->
                     <div class="col-12">
                         <label class="form-label">Products</label>
                         <input class="form-control" name="products" placeholder="Enter products">
                     </div>
 
+                    <!-- Custom -->
                     <div class="col-12">
                         <label class="form-label">Custom</label>
                         <input class="form-control" name="custom" placeholder="Enter custom field">
                     </div>
 
+                    <!-- Submit Button -->
                     <div class="col-12">
                         <button class="btn btn-dark w-100 mt-3">Save</button>
                     </div>
