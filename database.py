@@ -1,130 +1,43 @@
-import sqlite3
-from config import DB_NAME
+import gspread
+import json
+import os
+from google.oauth2.service_account import Credentials
 
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets",
+          "https://www.googleapis.com/auth/drive"]
 
-# --------------------------------------------------
-# TABLE CREATION
-# --------------------------------------------------
+def get_sheet():
+    creds_json = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+    creds = Credentials.from_service_account_info(creds_json, scopes=SCOPES)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key(os.environ["SHEET_ID"]).sheet1
+    return sheet
 
-def create_tables():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS cards (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            card_group INTEGER UNIQUE,
-            name TEXT,
-            company TEXT,
-            email TEXT,
-            phone TEXT,
-            date TEXT,
-            products TEXT,
-            custom TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
+# ----------------- CRUD -----------------
 
-
-
-# --------------------------------------------------
-# ADD CARD (FIELDS CAN BE SKIPPED)
-# --------------------------------------------------
-
-def add_card(card_group, name=None, company=None, email=None,
+def add_card(group_id, name=None, company=None, email=None,
              phone=None, date=None, products=None, custom=None):
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("""
-        INSERT INTO cards
-        (card_group, name, company, email, phone, date, products, custom)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (card_group, name, company, email, phone, date, products, custom))
-    conn.commit()
-    conn.close()
-
-
-# --------------------------------------------------
-# GET ALL CARDS
-# --------------------------------------------------
+    sheet = get_sheet()
+    sheet.append_row([group_id, name, company, email, phone, date, products, custom])
 
 def get_cards():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("""
-        SELECT
-            card_group, name, company, email, phone, date, products, custom
-        FROM cards
-        ORDER BY card_group
-    """)
-    data = c.fetchall()
-    conn.close()
-    return data
-
-
-# --------------------------------------------------
-# SEARCH (ANY FIELD)
-# --------------------------------------------------
+    sheet = get_sheet()
+    rows = sheet.get_all_values()[1:]  # skip header
+    return [tuple(r) for r in rows]  # returns (group_id, name, company, email, phone, date, products, custom)
 
 def search_cards(keyword):
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    like = f"%{keyword.lower()}%"
-    c.execute("""
-        SELECT
-            card_group, name, company, email, phone, date, products, custom
-        FROM cards
-        WHERE LOWER(name) LIKE ?
-           OR LOWER(company) LIKE ?
-           OR LOWER(email) LIKE ?
-           OR LOWER(phone) LIKE ?
-           OR LOWER(products) LIKE ?
-           OR LOWER(custom) LIKE ?
-        ORDER BY card_group
-    """, (like, like, like, like, like, like))
-    data = c.fetchall()
-    conn.close()
-    return data
+    sheet = get_sheet()
+    rows = sheet.get_all_values()[1:]
+    keyword = keyword.lower()
+    result = []
+    for r in rows:
+        if any(keyword in (cell or '').lower() for cell in r):
+            result.append(tuple(r))
+    return result
 
-
-# --------------------------------------------------
-# UPDATE CARD (PARTIAL UPDATE SUPPORTED)
-# --------------------------------------------------
-
-def update_card(card_group, **fields):
-    if not fields:
-        return
-
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-
-    updates = []
-    values = []
-
-    for key, value in fields.items():
-        updates.append(f"{key}=?")
-        values.append(value)
-
-    values.append(card_group)
-
-    query = f"""
-        UPDATE cards
-        SET {', '.join(updates)}
-        WHERE card_group=?
-    """
-
-    c.execute(query, values)
-    conn.commit()
-    conn.close()
-
-
-# --------------------------------------------------
-# DELETE CARD
-# --------------------------------------------------
-
-def delete_card(card_group):
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("DELETE FROM cards WHERE card_group=?", (card_group,))
-    conn.commit()
-    conn.close()
+def delete_card(group_id):
+    sheet = get_sheet()
+    rows = sheet.get_all_values()
+    for i in range(len(rows) - 1, 0, -1):  # iterate backwards
+        if rows[i][0] == str(group_id):
+            sheet.delete_rows(i + 1)
