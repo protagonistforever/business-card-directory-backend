@@ -7,26 +7,36 @@ app.secret_key = config.SECRET_KEY
 
 create_tables()
 
+
+# --------------------------------------------------
+# HOME – SHOW ALL CARDS
+# --------------------------------------------------
+
 @app.route("/")
 def home():
     rows = get_cards()
-    cards = {}
-    for g, f, v in rows:
-        cards.setdefault(g, {})[f] = v
-    return render_template("search.html", cards=cards, keyword="")
+    return render_template("search.html", cards=rows, keyword="")
+
+
+# --------------------------------------------------
+# SEARCH
+# --------------------------------------------------
 
 @app.route("/search")
 def search():
     q = request.args.get("q", "")
     rows = search_cards(q)
-    cards = {}
-    for g, f, v in rows:
-        cards.setdefault(g, {})[f] = v
-    return render_template("search.html", cards=cards, keyword=q)
+    return render_template("search.html", cards=rows, keyword=q)
+
+
+# --------------------------------------------------
+# ADMIN LOGIN
+# --------------------------------------------------
 
 @app.route("/admin")
 def admin():
     return render_template("admin_login.html")
+
 
 @app.route("/admin/auth", methods=["POST"])
 def auth():
@@ -38,17 +48,23 @@ def auth():
         return redirect("/admin/dashboard")
     return "Invalid Login", 401
 
+
+# --------------------------------------------------
+# ADMIN DASHBOARD
+# --------------------------------------------------
+
 @app.route("/admin/dashboard")
 def dashboard():
     if "admin" not in session:
         return redirect("/admin")
 
     rows = get_cards()
-    cards = {}
-    for g, f, v in rows:
-        cards.setdefault(g, {})[f] = v
+    return render_template("admin_dashboard.html", cards=rows)
 
-    return render_template("admin_dashboard.html", cards=cards)
+
+# --------------------------------------------------
+# ADD CARD
+# --------------------------------------------------
 
 @app.route("/admin/add", methods=["GET", "POST"])
 def add():
@@ -56,33 +72,49 @@ def add():
         return redirect("/admin")
 
     if request.method == "POST":
-        # Safe retrieval of all fields
         try:
-            group = int(request.form.get("group", 0))
-        except ValueError:
-            group = 0  # default if not provided or invalid
+            group = int(request.form.get("group"))
+        except (TypeError, ValueError):
+            return "Invalid card group", 400
 
-        fields = ["name", "company", "email", "phone", "date", "products", "custom"]
-        for f in fields:
-            value = request.form.get(f)
-            if value:  # only save non-empty fields
-                add_field(group, f, value)
+        add_card(
+            card_group=group,
+            name=request.form.get("name") or None,
+            company=request.form.get("company") or None,
+            email=request.form.get("email") or None,
+            phone=request.form.get("phone") or None,
+            date=request.form.get("date") or None,
+            products=request.form.get("products") or None,
+            custom=request.form.get("custom") or None,
+        )
 
         return redirect("/admin/dashboard")
 
     return render_template("add_card.html")
 
+
+# --------------------------------------------------
+# DELETE CARD
+# --------------------------------------------------
+
 @app.route("/admin/delete/<int:g>")
 def delete(g):
     if "admin" not in session:
         return redirect("/admin")
+
     delete_card(g)
     return redirect("/admin/dashboard")
+
+
+# --------------------------------------------------
+# LOGOUT
+# --------------------------------------------------
 
 @app.route("/admin/logout")
 def logout():
     session.pop("admin", None)
     return redirect("/")
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=5000)
