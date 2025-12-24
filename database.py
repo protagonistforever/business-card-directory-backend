@@ -41,3 +41,15 @@ def delete_card(group_id):
     for i in range(len(rows) - 1, 0, -1):  # iterate backwards
         if rows[i][0] == str(group_id):
             sheet.delete_rows(i + 1)
+
+def update_card(group_id, **fields):
+    sheet = get_sheet()
+    rows = sheet.get_all_values()
+    headers = rows[0]
+    for i, r in enumerate(rows[1:], start=2):
+        if r[0] == str(group_id):
+            for key, value in fields.items():
+                if key in headers:
+                    col_index = headers.index(key) + 1
+                    sheet.update_cell(i, col_index, value or "")
+            break
