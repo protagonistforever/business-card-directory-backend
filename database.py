@@ -9,12 +9,8 @@ from config import DB_NAME
 def create_tables():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-
-    # ONE-TIME RESET OF OLD SCHEMA
-    c.execute("DROP TABLE IF EXISTS cards")
-
     c.execute("""
-        CREATE TABLE cards (
+        CREATE TABLE IF NOT EXISTS cards (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             card_group INTEGER UNIQUE,
             name TEXT,
@@ -26,7 +22,6 @@ def create_tables():
             custom TEXT
         )
     """)
-
     conn.commit()
     conn.close()
 
